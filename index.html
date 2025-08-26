@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Easy Earning Bot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2ed914;
+      --primary-hover: #3bff21;
+      --secondary-color: #2a2a2e;
+      --background-color: #1c1c1f;
+      --text-color: #f0f0f0;
+      --text-muted-color: #a0a0a0;
+      --accent-color: #ff8c00;
+      --card-bg: #252528;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0; background-color: var(--background-color); color: var(--text-color);
+      font-family: 'Segoe UI', 'Roboto', sans-serif; display: flex; justify-content: center; align-items: center;
+      height: 100vh; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      width: 100%; height: 100%; max-width: 400px; background: var(--background-color);
+      display: flex; flex-direction: column; overflow: hidden; position: relative;
+    }
+
+    main {
+      flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; /* Space for footer nav */
+    }
+
+    .view { display: none; animation: fadeIn 0.4s ease-in-out; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .user-header-card {
+      background: var(--card-bg); border-radius: 16px; padding: 15px; margin-bottom: 25px;
+      display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .user-avatar {
+      width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; overflow: hidden;
+      background: linear-gradient(135deg, var(--primary-color), #00a651);
+      display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;
+    }
+
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-info .username { font-size: 18px; font-weight: 700; margin: 0; }
+    .user-info .title { font-size: 14px; color: var(--text-muted-color); margin: 0; }
+    
+    .balance-card {
+      background: linear-gradient(135deg, #00a651, #00753a); border-radius: 16px; padding: 20px;
+      text-align: center; margin-bottom: 25px;
+    }
+    .balance-card .label { font-size: 16px; opacity: 0.8; margin-bottom: 5px; }
+    .balance-card .balance-value { font-size: 36px; font-weight: 800; margin: 0; letter-spacing: 1px; }
+    .balance-card .stats-row { display: flex; justify-content: space-between; margin-top: 15px; }
+    .balance-card .stat-item { text-align: center; }
+    .balance-card .stat-value { font-size: 18px; font-weight: 600; color: var(--accent-color); }
+    .balance-card .stat-label { font-size: 12px; opacity: 0.8; }
+
+    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 15px; padding-left: 5px; border-left: 4px solid var(--primary-color); }
+    
+    .task-card {
+      background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 15px;
+      display: flex; align-items: center; cursor: pointer; transition: transform 0.2s ease, background-color 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .task-card:hover { transform: translateY(-3px); background-color: var(--secondary-color); }
+    .task-icon { font-size: 24px; color: var(--primary-color); margin-right: 20px; width: 30px; text-align: center; }
+    .task-details h3 { margin: 0; font-size: 16px; font-weight: 600; }
+    .task-details p { margin: 3px 0 0; font-size: 13px; color: var(--text-muted-color); }
+    .task-arrow { margin-left: auto; font-size: 18px; color: var(--text-muted-color); }
+
+    .list-item {
+      display: flex; align-items: center; background: var(--card-bg); padding: 12px 15px;
+      border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .list-item .rank { font-size: 16px; font-weight: 700; color: var(--text-muted-color); width: 30px; }
+    .list-item .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--secondary-color); margin-right: 15px; object-fit: cover; }
+    .list-item .info { flex-grow: 1; }
+    .list-item .info .name { font-weight: 600; font-size: 15px; }
+    .list-item .info .detail { font-size: 13px; color: var(--text-muted-color); }
+    .list-item .score { font-size: 16px; font-weight: 700; color: var(--accent-color); }
+    .history-icon { color: var(--primary-color); margin-right: 15px; font-size: 18px; }
+
+    .footer-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; width: 100%; max-width: 400px; margin: 0 auto;
+      display: flex; justify-content: space-around; background: var(--secondary-color);
+      padding: 10px 0; border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-button {
+      display: flex; flex-direction: column; align-items: center; color: var(--text-muted-color);
+      background: none; border: none; font-size: 12px; transition: color 0.2s ease, transform 0.2s ease;
+      cursor: pointer; padding: 5px 10px;
+    }
+
+    .nav-button .icon { font-size: 22px; margin-bottom: 4px; }
+    .nav-button:hover { color: var(--text-color); }
+    .nav-button.active { color: var(--primary-color); transform: scale(1.1); }
+
+    .action-button {
+      width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: 700;
+      margin-top: 15px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .primary-button { background: var(--primary-color); color: #000; }
+    .primary-button:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 217, 20, 0.3); }
+    .secondary-button { background: var(--secondary-color); color: var(--primary-color); }
+    .secondary-button:hover { background: #3a3a3e; }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);
+      display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s;
+    }
+
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--card-bg); padding: 25px; border-radius: 16px; width: 90%; max-width: 320px;
+      text-align: center; animation: slideIn 0.3s;
+    }
+
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-content h3 { margin-top: 0; font-size: 20px; }
+    .modal-content p { color: var(--text-muted-color); margin-bottom: 25px; }
+    .modal-actions { display: flex; gap: 10px; }
+
+    .loading { 
+      display: inline-block; width: 20px; height: 20px; 
+      border: 3px solid var(--text-muted-color);
+      border-radius: 50%; border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+  </style>
+
+  <script src='//libtl.com/sdk.js' data-zone='9743908' data-sdk='show_9743908'></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <main id="main-content">
+
+      <!-- HOME VIEW -->
+      <div id="home-view" class="view active">
+        <div class="user-header-card">
+          <div class="user-avatar" id="profile-pic">EE</div>
+          <div class="user-info">
+            <h2 class="username" id="username">Loading...</h2>
+            <p class="title">Welcome Back!</p>
+          </div>
+        </div>
+        
+        <div class="balance-card">
+          <p class="label">Total Balance</p>
+          <h1 class="balance-value" id="balance-value">$0.00</h1>
+          <div class="stats-row">
+            <div class="stat-item">
+              <div class="stat-value" id="total-views">0</div>
+              <div class="stat-label">Total Views</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="cpm-rate">$1.50</div>
+              <div class="stat-label">CPM Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="section-title">Quick Actions</h2>
+        <div class="task-card" onclick="showView('tasks-view')">
+          <div class="task-icon"><i class="fa-solid fa-list-check"></i></div>
+          <div class="task-details">
+            <h3>View Tasks</h3>
+            <p>Watch ads and earn $1.50 per 1000 views (CPM).</p>
+          </div>
+          <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <div class="task-card" onclick="openWithdrawModal()">
+          <div class="task-icon"><i class="fa-solid fa-wallet"></i></div>
+          <div class="task-details">
+            <h3>Withdraw Funds</h3>
+            <p>Request to withdraw your available balance.</p>
+          </div>
+          <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+      </div>
+
+      <!-- TASKS VIEW -->
+      <div id="tasks-view" class="view">
+        <h2 class="section-title">Earning Tasks</h2>
+        <div class="task-card" onclick="showRewardedInterstitial()">
+          <div class="task-icon"><i class="fa-solid fa-rectangle-ad"></i></div>
+          <div class="task-details">
+            <h3>Rewarded Interstitial</h3>
+            <p>Watch a full-screen ad to earn from CPM revenue.</p>
+          </div>
+          <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
+        </div>
+
+        <div class="task-card" onclick="showRewardedPopup()">
+          <div class="task-icon"><i class="fa-solid fa-window-restore"></i></div>
+          <div class="task-details">
+            <h3>Rewarded Popup</h3>
+            <p>View a popup ad for CPM-based earnings.</p>
+          </div>
+          <div class="task-arrow"><i class="fa-solid fa-play"></i></div>
+        </div>
+      </div>
+
+      <!-- LEADERBOARD VIEW -->
+      <div id="leaderboard-view" class="view">
+        <h2 class="section-title">Top Earners</h2>
+        <div id="leaderboard-list">
+          <div class="loading" style="margin: 20px auto;"></div>
+        </div>
+      </div>
+
+      <!-- HISTORY VIEW -->
+      <div id="history-view" class="view">
+        <h2 class="section-title">Recent Activity</h2>
+        <div id="history-list">
+          <div class="loading" style="margin: 20px auto;"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <nav class="footer-nav">
+      <button class="nav-button active" onclick="showView('home-view')"><i class="icon fa-solid fa-house"></i>Home</button>
+      <button class="nav-button" onclick="showView('tasks-view')"><i class="icon fa-solid fa-list-check"></i>Tasks</button>
+      <button class="nav-button" onclick="showView('leaderboard-view')"><i class="icon fa-solid fa-trophy"></i>Leaders</button>
+      <button class="nav-button" onclick="showView('history-view')"><i class="icon fa-solid fa-clock-rotate-left"></i>History</button>
+      <button class="nav-button" onclick="shareApp()"><i class="icon fa-solid fa-share-nodes"></i>Share</button>
+    </nav>
+  </div>
+
+  <!-- WITHDRAWAL MODAL -->
+  <div class="modal-overlay" id="withdraw-modal">
+    <div class="modal-content">
+      <h3>Confirm Withdrawal</h3>
+      <p>You are about to request a withdrawal of your entire balance. Please confirm.</p>
+      <div class="modal-actions">
+        <button class="action-button secondary-button" onclick="closeWithdrawModal()">Cancel</button>
+        <button class="action-button primary-button" onclick="requestWithdraw()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+    // --- Firebase Configuration ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBddXA41mOYdDRB_krbEbutBjYD-QReHUk",
+      authDomain: "clickearn-ab9fa.firebaseapp.com",
+      databaseURL: "https://clickearn-ab9fa-default-rtdb.firebaseio.com",
+      projectId: "clickearn-ab9fa",
+      storageBucket: "clickearn-ab9fa.firebasestorage.app",
+      messagingSenderId: "720472139519",
+      appId: "1:720472139519:web:3e10164a02608a62968eca"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // --- State Variables ---
+    let totalViews = 0;
+    let balance = 0.00;
+    let historyLog = [];
+    let tgUser = null;
+    let userId = null;
+    
+    // CPM Configuration: $1.50 per 1000 views
+    const CPM_RATE = 1.50;
+    const VIEWS_PER_CPM = 1000;
+
+    // --- Core App Logic ---
+    document.addEventListener('DOMContentLoaded', () => {
+        initApp();
+    });
+
+    function initApp() {
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            tgUser = Telegram.WebApp.initDataUnsafe.user;
+            userId = tgUser ? tgUser.id.toString() : 'guest_' + Date.now();
+        } else {
+            userId = 'guest_' + Date.now();
+        }
+        
+        loadTelegramUser();
+        loadDataFromFirebase();
+        showView('home-view');
+        initializeInAppAds();
+    }
+
+    // --- Firebase Data Management ---
+    function loadDataFromFirebase() {
+        if (!userId) return;
+        
+        const userRef = database.ref(`users/${userId}`);
+        userRef.once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                totalViews = userData.totalViews || 0;
+                balance = userData.balance || 0.00;
+                historyLog = userData.historyLog || [];
+            }
+            updateDisplay();
+            loadLeaderboardFromFirebase();
+        }).catch((error) => {
+            console.error('Error loading user data:', error);
+            updateDisplay(); // Show default values
+        });
+    }
+
+    function saveDataToFirebase() {
+        if (!userId) return;
+        
+        const userRef = database.ref(`users/${userId}`);
+        const userData = {
+            totalViews: totalViews,
+            balance: balance,
+            historyLog: historyLog,
+            username: tgUser ? tgUser.first_name : 'Guest User',
+            lastUpdated: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        userRef.set(userData).catch((error) => {
+            console.error('Error saving user data:', error);
+        });
+    }
+
+    function loadLeaderboardFromFirebase() {
+        database.ref('users').orderByChild('balance').limitToLast(10)
+            .once('value').then((snapshot) => {
+                const leaderboardData = [];
+                snapshot.forEach((child) => {
+                    const user = child.val();
+                    if (user.balance > 0) {
+                        leaderboardData.push({
+                            name: user.username || 'Anonymous',
+                            score: user.totalViews || 0,
+                            balance: user.balance || 0
+                        });
+                    }
+                });
+                renderLeaderboard(leaderboardData.reverse());
+            }).catch((error) => {
+                console.error('Error loading leaderboard:', error);
+                renderLeaderboard([]);
+            });
+    }
+
+    // --- Initialize Automatic Ads ---
+    function initializeInAppAds() {
+        if (typeof show_9743908 === 'function') {
+            show_9743908({
+              type: 'inApp',
+              inAppSettings: {
+                frequency: 2,
+                capping: 0.1,
+                interval: 30,
+                timeout: 5,
+                everyPage: false
+              }
+            });
+            console.log("Automatic In-App Interstitial Ads Initialized.");
+        } else {
+            console.warn("Monetag SDK not ready for In-App Ads. Retrying...");
+            setTimeout(initializeInAppAds, 2000);
+        }
+    }
+
+    // --- View Management ---
+    function showView(viewId) {
+        document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+        document.getElementById(viewId).classList.add('active');
+        
+        document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.querySelector(`.nav-button[onclick="showView('${viewId}')"]`);
+        if(activeBtn) activeBtn.classList.add('active');
+        
+        if (viewId === 'history-view') renderHistory();
+        if (viewId === 'leaderboard-view') loadLeaderboardFromFirebase();
+    }
+
+    function updateDisplay() {
+        document.getElementById('total-views').textContent = totalViews.toLocaleString();
+        document.getElementById('balance-value').textContent = `$${balance.toFixed(4)}`;
+    }
+
+    // --- User & Profile ---
+    function loadTelegramUser() {
+        if (tgUser) {
+            document.getElementById('username').textContent = tgUser.first_name || 'Telegram User';
+            const profilePicDiv = document.getElementById('profile-pic');
+            if (tgUser.photo_url) {
+                profilePicDiv.innerHTML = `<img src="${tgUser.photo_url}" alt="P">`;
+            } else {
+                profilePicDiv.textContent = (tgUser.first_name || 'U').charAt(0);
+            }
+        }
+    }
+
+    // --- History Logic ---
+    function addToHistory(type, detail) {
+        const timestamp = new Date().toISOString();
+        historyLog.unshift({ type, detail, timestamp });
+        if (historyLog.length > 50) historyLog.pop();
+        saveDataToFirebase();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        if (historyLog.length === 0) {
+            list.innerHTML = `<div class="list-item"><div class="info"><div class="name">No activity yet.</div><div class="detail">Watch some ads to get started!</div></div></div>`;
+            return;
+        }
+
+        list.innerHTML = historyLog.map(item => {
+            const icon = item.type === 'earn' 
+                ? '<i class="fa-solid fa-plus-circle" style="color: var(--primary-color);"></i>' 
+                : '<i class="fa-solid fa-paper-plane" style="color: var(--accent-color);"></i>';
+            return `
+                <div class="list-item">
+                    <div class="history-icon">${icon}</div>
+                    <div class="info">
+                        <div class="name">${item.detail}</div>
+                        <div class="detail">${new Date(item.timestamp).toLocaleString()}</div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    // --- Leaderboard Logic ---
+    function renderLeaderboard(leaderboardData = []) {
+        if (leaderboardData.length === 0) {
+            document.getElementById('leaderboard-list').innerHTML = 
+                `<div class="list-item"><div class="info"><div class="name">No data available</div><div class="detail">Be the first to earn and appear on the leaderboard!</div></div></div>`;
+            return;
+        }
+
+        document.getElementById('leaderboard-list').innerHTML = leaderboardData.map((user, index) => `
+            <div class="list-item">
+                <div class="rank">#${index + 1}</div>
+                <div class="avatar" style="background: linear-gradient(135deg, var(--primary-color), #00a651); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">
+                    ${user.name.charAt(0).toUpperCase()}
+                </div>
+                <div class="info">
+                    <div class="name">${user.name}</div>
+                    <div class="detail">${user.score.toLocaleString()} views</div>
+                </div>
+                <div class="score">$${user.balance.toFixed(2)}</div>
+            </div>
+        `).join('');
+    }
+
+    // --- CPM-based Earning Functions ---
+    function grantReward() {
+        // Increment view count
+        totalViews += 1;
+        
+        // Calculate CPM-based earnings: $1.50 per 1000 views
+        const earningsPerView = CPM_RATE / VIEWS_PER_CPM;
+        balance += earningsPerView;
+        
+        updateDisplay();
+        addToHistory('earn', `+1 View (+$${earningsPerView.toFixed(4)} CPM)`);
+        saveDataToFirebase();
+        
+        if (Telegram.WebApp.HapticFeedback) {
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+        
+        alert(`Congratulations! You've earned +$${earningsPerView.toFixed(4)} from CPM. Total views: ${totalViews.toLocaleString()}, Balance: $${balance.toFixed(4)}`);
+    }
+
+    function showRewardedInterstitial() {
+        if (typeof show_9743908 !== 'function') {
+            return alert('Ad provider is not ready.');
+        }
+        show_9743908().then(grantReward).catch(e => {
+            console.error('Ad error:', e);
+            alert('Ad could not be shown.');
+        });
+    }
+
+    function showRewardedPopup() {
+        if (typeof show_9743908 !== 'function') {
+            return alert('Ad provider is not ready.');
+        }
+        show_9743908('pop').then(grantReward).catch(e => {
+            console.error('Ad error:', e);
+            alert('Ad could not be shown.');
+        });
+    }
+
+    // --- Withdrawal Logic ---
+    function openWithdrawModal() {
+        if (balance < 1) {
+            if (Telegram.WebApp.HapticFeedback) {
+                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+            }
+            return alert("Minimum withdrawal amount is $1.00. Keep earning!");
+        }
+        document.getElementById('withdraw-modal').classList.add('active');
+    }
+
+    function closeWithdrawModal() {
+        document.getElementById('withdraw-modal').classList.remove('active');
+    }
+    
+    function requestWithdraw() {
+        closeWithdrawModal();
+        const botToken = '5435984036:AAF2OFc0pmphZtr7T8r4vNzHrOvo8AvEGFg';
+        const adminUserId = '5308426585';
+        const userInfo = tgUser ? `@${tgUser.username} (ID: ${tgUser.id})` : 'Unknown User';
+        const message = `💸 *Withdrawal Request*\n\n👤 *User:* ${userInfo}\n💰 *Amount:* $${balance.toFixed(4)}\n📊 *Total Views:* ${totalViews.toLocaleString()}\n\n_Please process this request._`;
+        
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                chat_id: adminUserId, 
+                text: message, 
+                parse_mode: "Markdown" 
+            })
+        }).then(res => res.json())
+        .then(data => {
+            if (data.ok) {
+                if (Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                alert("Your withdrawal request has been sent successfully!");
+                addToHistory('withdraw', `Request for $${balance.toFixed(4)}`);
+            } else {
+                if (Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                }
+                alert("Failed to send request. Please try again later.");
+            }
+        }).catch(err => {
+            console.error('Withdrawal error:', err);
+            if (Telegram.WebApp.HapticFeedback) {
+                Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+            }
+            alert("An error occurred. Check your connection and try again.");
+        });
+    }
+
+    // --- Share & Referral ---
+    function shareApp() {
+        if (!tgUser) return alert("Could not get user data from Telegram.");
+        const botUsername = "Penghasil_danaa_bot";
+        const referralLink = `https://t.me/${botUsername}?start=${tgUser.id}`;
+        const text = `🎉 Join this amazing CPM earning bot! Earn $1.50 per 1000 ad views. Use my link:`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
+        
+        if (Telegram.WebApp.openTelegramLink) {
+            Telegram.WebApp.openTelegramLink(shareUrl);
+        } else {
+            window.open(shareUrl, '_blank');
+        }
+    }
+</script>
+</body>
+</html>
