@@ -140,6 +140,101 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .method-button {
+      width: 100%; padding: 15px 20px; border: 2px solid var(--secondary-color);
+      border-radius: 12px; background: var(--card-bg); color: var(--text-color);
+      display: flex; align-items: center; gap: 15px; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: all 0.3s ease; text-align: left;
+    }
+
+    .method-button:hover {
+      border-color: var(--primary-color); background: var(--secondary-color);
+      transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 217, 20, 0.2);
+    }
+
+    .method-button.crypto {
+      border-color: #f7931a; color: #f7931a;
+    }
+
+    .method-button.crypto:hover {
+      border-color: #ffb347; background: rgba(247, 147, 26, 0.1);
+      box-shadow: 0 5px 15px rgba(247, 147, 26, 0.3);
+    }
+
+    .method-button.manual {
+      border-color: var(--accent-color); color: var(--accent-color);
+    }
+
+    .method-button.manual:hover {
+      border-color: #ffa500; background: rgba(255, 140, 0, 0.1);
+      box-shadow: 0 5px 15px rgba(255, 140, 0, 0.3);
+    }
+
+    .method-button i {
+      font-size: 24px; width: 30px; text-align: center;
+    }
+
+    .bonus-card {
+      background: linear-gradient(135deg, #ff6b35, #ff8c00); border-radius: 16px; padding: 20px;
+      margin-bottom: 25px; display: flex; align-items: center; cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease; border: 2px solid transparent;
+    }
+
+    .bonus-card:hover {
+      transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+    }
+
+    .bonus-card.claimed {
+      background: linear-gradient(135deg, #666, #888); cursor: not-allowed;
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .bonus-icon { font-size: 40px; margin-right: 20px; }
+    .bonus-info { flex-grow: 1; }
+    .bonus-info h3 { margin: 0; font-size: 18px; font-weight: 700; }
+    .bonus-info p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+    .bonus-amount { font-size: 24px; font-weight: 800; color: #fff; }
+
+    .referral-stats-card {
+      background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 16px;
+      padding: 20px; margin-bottom: 25px; text-align: center;
+    }
+
+    .stat-row { display: flex; justify-content: space-around; margin-bottom: 15px; }
+    .referral-rate { padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); }
+    .referral-rate p { margin: 0; font-size: 16px; font-weight: 600; }
+
+    .achievement-item {
+      background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px;
+      display: flex; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .achievement-item.completed {
+      border-color: var(--primary-color); background: linear-gradient(135deg, rgba(46, 217, 20, 0.1), rgba(0, 166, 81, 0.1));
+    }
+
+    .achievement-icon {
+      font-size: 32px; margin-right: 20px; width: 50px; text-align: center;
+    }
+
+    .achievement-info { flex-grow: 1; }
+    .achievement-info h4 { margin: 0; font-size: 16px; font-weight: 600; }
+    .achievement-info p { margin: 5px 0 0; font-size: 13px; color: var(--text-muted-color); }
+
+    .achievement-reward {
+      font-size: 18px; font-weight: 700; color: var(--accent-color);
+    }
+
+    .progress-bar {
+      width: 100%; height: 6px; background: var(--secondary-color); border-radius: 3px;
+      overflow: hidden; margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+      border-radius: 3px; transition: width 0.3s ease;
+    }
+
   </style>
 
   <script src='//libtl.com/sdk.js' data-zone='9743908' data-sdk='show_9743908'></script>
@@ -161,6 +256,45 @@
             <h2 class="username" id="username">Loading...</h2>
             <p class="title">Welcome Back!</p>
           </div>
+
+  <!-- WITHDRAWAL METHODS MODAL -->
+  <div class="modal-overlay" id="methods-modal">
+    <div class="modal-content">
+      <h3>Select Withdrawal Method</h3>
+      <p>Choose how you want to receive your $<span id="withdraw-amount"></span></p>
+      
+      <div style="display: grid; gap: 10px; margin: 20px 0;">
+        <!-- E-Wallets -->
+        <button class="method-button" onclick="selectWithdrawMethod('paypal')">
+          <i class="fa-brands fa-paypal"></i> PayPal
+        </button>
+        <button class="method-button" onclick="selectWithdrawMethod('dana')">
+          <i class="fa-solid fa-wallet"></i> DANA
+        </button>
+        
+        <!-- Cryptocurrencies -->
+        <button class="method-button crypto" onclick="selectWithdrawMethod('btc')">
+          <i class="fa-brands fa-bitcoin"></i> Bitcoin (BTC)
+        </button>
+        <button class="method-button crypto" onclick="selectWithdrawMethod('eth')">
+          <i class="fa-brands fa-ethereum"></i> Ethereum (ETH)
+        </button>
+        <button class="method-button crypto" onclick="selectWithdrawMethod('ltc')">
+          <i class="fa-solid fa-coins"></i> Litecoin (LTC)
+        </button>
+        <button class="method-button crypto" onclick="selectWithdrawMethod('doge')">
+          <i class="fa-solid fa-dog"></i> Dogecoin (DOGE)
+        </button>
+        
+        <!-- Manual Processing -->
+        <button class="method-button manual" onclick="selectWithdrawMethod('manual')">
+          <i class="fa-solid fa-hand-holding-dollar"></i> Manual Review
+        </button>
+      </div>
+      
+      <button class="action-button secondary-button" onclick="closeMethodsModal()">Cancel</button>
+    </div>
+  </div>
         </div>
         
         <div class="balance-card">
@@ -172,10 +306,24 @@
               <div class="stat-label">Total Views</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value" id="cpm-rate">$1.50</div>
-              <div class="stat-label">CPM Rate</div>
+              <div class="stat-value" id="daily-streak">0</div>
+              <div class="stat-label">Day Streak</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="referral-count">0</div>
+              <div class="stat-label">Referrals</div>
             </div>
           </div>
+        </div>
+
+        <!-- Daily Bonus Card -->
+        <div class="bonus-card" id="daily-bonus-card" onclick="claimDailyBonus()">
+          <div class="bonus-icon">🎁</div>
+          <div class="bonus-info">
+            <h3 id="bonus-title">Daily Bonus Available!</h3>
+            <p id="bonus-description">Claim your daily reward</p>
+          </div>
+          <div class="bonus-amount" id="bonus-amount">+$0.01</div>
         </div>
 
         <h2 class="section-title">Quick Actions</h2>
@@ -193,6 +341,15 @@
           <div class="task-details">
             <h3>Withdraw Funds</h3>
             <p>Request to withdraw your available balance.</p>
+          </div>
+          <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <div class="task-card" onclick="showView('achievements-view')">
+          <div class="task-icon"><i class="fa-solid fa-trophy"></i></div>
+          <div class="task-details">
+            <h3>Achievements</h3>
+            <p>View your progress and unlock rewards.</p>
           </div>
           <div class="task-arrow"><i class="fa-solid fa-chevron-right"></i></div>
         </div>
@@ -220,6 +377,46 @@
         </div>
       </div>
 
+      <!-- ACHIEVEMENTS VIEW -->
+      <div id="achievements-view" class="view">
+        <h2 class="section-title">Achievements</h2>
+        <div id="achievements-list">
+          <div class="loading" style="margin: 20px auto;"></div>
+        </div>
+      </div>
+
+      <!-- REFERRALS VIEW -->
+      <div id="referrals-view" class="view">
+        <h2 class="section-title">Referral Program</h2>
+        
+        <div class="referral-stats-card">
+          <div class="stat-row">
+            <div class="stat-item">
+              <div class="stat-value" id="ref-count-display">0</div>
+              <div class="stat-label">Total Referrals</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="ref-earnings-display">$0.00</div>
+              <div class="stat-label">Referral Earnings</div>
+            </div>
+          </div>
+          <div class="referral-rate">
+            <p>🎉 Earn 20% of your referrals' ad revenue!</p>
+          </div>
+        </div>
+
+        <div class="task-card">
+          <div class="task-icon"><i class="fa-solid fa-share-nodes"></i></div>
+          <div class="task-details">
+            <h3>Your Referral Link</h3>
+            <p id="referral-link">Loading...</p>
+          </div>
+          <div class="task-arrow" onclick="copyReferralLink()">
+            <i class="fa-solid fa-copy"></i>
+          </div>
+        </div>
+      </div>
+
       <!-- LEADERBOARD VIEW -->
       <div id="leaderboard-view" class="view">
         <h2 class="section-title">Top Earners</h2>
@@ -241,8 +438,8 @@
     <nav class="footer-nav">
       <button class="nav-button active" onclick="showView('home-view')"><i class="icon fa-solid fa-house"></i>Home</button>
       <button class="nav-button" onclick="showView('tasks-view')"><i class="icon fa-solid fa-list-check"></i>Tasks</button>
-      <button class="nav-button" onclick="showView('leaderboard-view')"><i class="icon fa-solid fa-trophy"></i>Leaders</button>
-      <button class="nav-button" onclick="showView('history-view')"><i class="icon fa-solid fa-clock-rotate-left"></i>History</button>
+      <button class="nav-button" onclick="showView('referrals-view')"><i class="icon fa-solid fa-users"></i>Referrals</button>
+      <button class="nav-button" onclick="showView('achievements-view')"><i class="icon fa-solid fa-trophy"></i>Rewards</button>
       <button class="nav-button" onclick="shareApp()"><i class="icon fa-solid fa-share-nodes"></i>Share</button>
     </nav>
   </div>
@@ -251,10 +448,10 @@
   <div class="modal-overlay" id="withdraw-modal">
     <div class="modal-content">
       <h3>Confirm Withdrawal</h3>
-      <p>You are about to request a withdrawal of your entire balance. Please confirm.</p>
+      <p>Choose your preferred withdrawal method. Minimum amount is $1.00.</p>
       <div class="modal-actions">
         <button class="action-button secondary-button" onclick="closeWithdrawModal()">Cancel</button>
-        <button class="action-button primary-button" onclick="requestWithdraw()">Confirm</button>
+        <button class="action-button primary-button" onclick="showWithdrawMethods()">Choose Method</button>
       </div>
     </div>
   </div>
@@ -281,10 +478,17 @@
     let historyLog = [];
     let tgUser = null;
     let userId = null;
+    let referralCount = 0;
+    let achievements = [];
+    let dailyStreak = 0;
+    let lastClaimDate = null;
+    let totalReferralEarnings = 0;
     
     // CPM Configuration: $1.50 per 1000 views
     const CPM_RATE = 1.50;
     const VIEWS_PER_CPM = 1000;
+    const REFERRAL_BONUS = 0.20; // 20% of referee earnings
+    const DAILY_BONUS_BASE = 0.01; // Base daily bonus
 
     // --- Core App Logic ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -302,6 +506,7 @@
         }
         
         loadTelegramUser();
+        loadBotSettings();
         loadDataFromFirebase();
         showView('home-view');
         initializeInAppAds();
@@ -318,6 +523,11 @@
                 totalViews = userData.totalViews || 0;
                 balance = userData.balance || 0.00;
                 historyLog = userData.historyLog || [];
+                referralCount = userData.referralCount || 0;
+                achievements = userData.achievements || [];
+                dailyStreak = userData.dailyStreak || 0;
+                lastClaimDate = userData.lastClaimDate || null;
+                totalReferralEarnings = userData.totalReferralEarnings || 0;
             }
             updateDisplay();
             loadLeaderboardFromFirebase();
@@ -335,6 +545,11 @@
             totalViews: totalViews,
             balance: balance,
             historyLog: historyLog,
+            referralCount: referralCount,
+            achievements: achievements,
+            dailyStreak: dailyStreak,
+            lastClaimDate: lastClaimDate,
+            totalReferralEarnings: totalReferralEarnings,
             username: tgUser ? tgUser.first_name : 'Guest User',
             lastUpdated: firebase.database.ServerValue.TIMESTAMP
         };
@@ -396,11 +611,20 @@
         
         if (viewId === 'history-view') renderHistory();
         if (viewId === 'leaderboard-view') loadLeaderboardFromFirebase();
+        if (viewId === 'achievements-view') renderAchievements();
+        if (viewId === 'referrals-view') updateReferralLink();
     }
 
     function updateDisplay() {
         document.getElementById('total-views').textContent = totalViews.toLocaleString();
-        document.getElementById('balance-value').textContent = `$${balance.toFixed(4)}`;
+        document.getElementById('balance-value').textContent = `${balance.toFixed(4)}`;
+        document.getElementById('daily-streak').textContent = dailyStreak;
+        document.getElementById('referral-count').textContent = referralCount;
+        document.getElementById('ref-count-display').textContent = referralCount;
+        document.getElementById('ref-earnings-display').textContent = `${totalReferralEarnings.toFixed(4)}`;
+        
+        updateDailyBonusDisplay();
+        updateReferralLink();
     }
 
     // --- User & Profile ---
@@ -479,14 +703,15 @@
         balance += earningsPerView;
         
         updateDisplay();
-        addToHistory('earn', `+1 View (+$${earningsPerView.toFixed(4)} CPM)`);
+        addToHistory('earn', `+1 View (+${earningsPerView.toFixed(4)} CPM)`);
+        checkAchievements();
         saveDataToFirebase();
         
         if (Telegram.WebApp.HapticFeedback) {
             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
         }
         
-        alert(`Congratulations! You've earned +$${earningsPerView.toFixed(4)} from CPM. Total views: ${totalViews.toLocaleString()}, Balance: $${balance.toFixed(4)}`);
+        alert(`Congratulations! You've earned +${earningsPerView.toFixed(4)} from CPM. Total views: ${totalViews.toLocaleString()}, Balance: ${balance.toFixed(4)}`);
     }
 
     function showRewardedInterstitial() {
@@ -509,6 +734,24 @@
         });
     }
 
+    // --- Bot Settings (will be loaded from Firebase) ---
+    let botSettings = {
+        botToken: '5435984036:AAF2OFc0pmphZtr7T8r4vNzHrOvo8AvEGFg',
+        adminUserId: '5308426585',
+        botName: '@Penghasil_danaa_bot'
+    };
+
+    // --- Load Bot Settings from Firebase ---
+    function loadBotSettings() {
+        database.ref('settings/bot').once('value').then((snapshot) => {
+            if (snapshot.exists()) {
+                botSettings = { ...botSettings, ...snapshot.val() };
+            }
+        }).catch((error) => {
+            console.error('Error loading bot settings:', error);
+        });
+    }
+
     // --- Withdrawal Logic ---
     function openWithdrawModal() {
         if (balance < 1) {
@@ -523,19 +766,46 @@
     function closeWithdrawModal() {
         document.getElementById('withdraw-modal').classList.remove('active');
     }
-    
-    function requestWithdraw() {
-        closeWithdrawModal();
-        const botToken = '5435984036:AAF2OFc0pmphZtr7T8r4vNzHrOvo8AvEGFg';
-        const adminUserId = '5308426585';
-        const userInfo = tgUser ? `@${tgUser.username} (ID: ${tgUser.id})` : 'Unknown User';
-        const message = `💸 *Withdrawal Request*\n\n👤 *User:* ${userInfo}\n💰 *Amount:* $${balance.toFixed(4)}\n📊 *Total Views:* ${totalViews.toLocaleString()}\n\n_Please process this request._`;
+
+    function showWithdrawMethods() {
+        const methodsModal = document.getElementById('methods-modal');
+        const withdrawAmount = document.getElementById('withdraw-amount');
+        if (methodsModal && withdrawAmount) {
+            withdrawAmount.textContent = balance.toFixed(4);
+            methodsModal.classList.add('active');
+        }
+    }
+
+    function closeMethodsModal() {
+        const methodsModal = document.getElementById('methods-modal');
+        if (methodsModal) {
+            methodsModal.classList.remove('active');
+        }
+    }
+
+    function selectWithdrawMethod(method) {
+        closeMethodsModal();
+        const address = prompt(`Please enter your ${method.toUpperCase()} address/account:`);
+        if (!address || address.trim() === '') {
+            return alert('Address/account is required for withdrawal.');
+        }
         
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        requestWithdraw(method, address.trim());
+    }
+    
+    function requestWithdraw(method = 'manual', address = '') {
+        closeWithdrawModal();
+        closeMethodsModal();
+        
+        const userInfo = tgUser ? `@${tgUser.username || 'N/A'} (ID: ${tgUser.id})` : 'Unknown User';
+        const methodInfo = method !== 'manual' ? `\n💳 *Method:* ${method.toUpperCase()}\n📮 *Address:* \`${address}\`` : '';
+        const message = `💸 *Withdrawal Request*\n\n👤 *User:* ${userInfo}\n💰 *Amount:* ${balance.toFixed(4)}\n📊 *Total Views:* ${totalViews.toLocaleString()}${methodInfo}\n\n_Please process this request._`;
+        
+        fetch(`https://api.telegram.org/bot${botSettings.botToken}/sendMessage`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                chat_id: adminUserId, 
+                chat_id: botSettings.adminUserId, 
                 text: message, 
                 parse_mode: "Markdown" 
             })
@@ -546,7 +816,7 @@
                     Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 }
                 alert("Your withdrawal request has been sent successfully!");
-                addToHistory('withdraw', `Request for $${balance.toFixed(4)}`);
+                addToHistory('withdraw', `Request for ${balance.toFixed(4)} via ${method.toUpperCase()}`);
             } else {
                 if (Telegram.WebApp.HapticFeedback) {
                     Telegram.WebApp.HapticFeedback.notificationOccurred('error');
@@ -565,8 +835,7 @@
     // --- Share & Referral ---
     function shareApp() {
         if (!tgUser) return alert("Could not get user data from Telegram.");
-        const botUsername = "Penghasil_danaa_bot";
-        const referralLink = `https://t.me/${botUsername}?start=${tgUser.id}`;
+        const referralLink = `https://t.me/${botSettings.botName}?start=${tgUser.id}`;
         const text = `🎉 Join this amazing CPM earning bot! Earn $1.50 per 1000 ad views. Use my link:`;
         const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(text)}`;
         
@@ -575,6 +844,266 @@
         } else {
             window.open(shareUrl, '_blank');
         }
+    }
+
+    // --- Daily Bonus System ---
+    function updateDailyBonusDisplay() {
+        const today = new Date().toDateString();
+        const canClaim = lastClaimDate !== today;
+        const bonusCard = document.getElementById('daily-bonus-card');
+        const bonusTitle = document.getElementById('bonus-title');
+        const bonusDesc = document.getElementById('bonus-description');
+        const bonusAmount = document.getElementById('bonus-amount');
+        
+        if (canClaim) {
+            bonusCard.classList.remove('claimed');
+            bonusTitle.textContent = 'Daily Bonus Available!';
+            bonusDesc.textContent = `Day ${dailyStreak + 1} - Claim your reward`;
+            bonusAmount.textContent = `+${(DAILY_BONUS_BASE * (1 + dailyStreak * 0.1)).toFixed(3)}`;
+        } else {
+            bonusCard.classList.add('claimed');
+            bonusTitle.textContent = 'Daily Bonus Claimed!';
+            bonusDesc.textContent = 'Come back tomorrow for more';
+            bonusAmount.textContent = '✓';
+        }
+    }
+
+    function claimDailyBonus() {
+        const today = new Date().toDateString();
+        if (lastClaimDate === today) {
+            return alert('Daily bonus already claimed! Come back tomorrow.');
+        }
+        
+        // Check if streak continues (claimed yesterday) or resets
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayString = yesterday.toDateString();
+        
+        if (lastClaimDate === yesterdayString) {
+            dailyStreak += 1;
+        } else if (lastClaimDate !== null) {
+            dailyStreak = 1; // Reset streak but start at 1
+        } else {
+            dailyStreak = 1; // First time claiming
+        }
+        
+        // Calculate bonus with streak multiplier
+        const bonusAmount = DAILY_BONUS_BASE * (1 + (dailyStreak - 1) * 0.1);
+        balance += bonusAmount;
+        lastClaimDate = today;
+        
+        updateDisplay();
+        addToHistory('bonus', `Daily Bonus Day ${dailyStreak}: +${bonusAmount.toFixed(4)}`);
+        checkAchievements();
+        saveDataToFirebase();
+        
+        if (Telegram.WebApp.HapticFeedback) {
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+        
+        alert(`🎉 Daily bonus claimed! +${bonusAmount.toFixed(4)}\nStreak: ${dailyStreak} days`);
+    }
+
+    // --- Achievement System ---
+    function checkAchievements() {
+        const newAchievements = [];
+        
+        // View-based achievements
+        if (totalViews >= 10 && !achievements.includes('first_10_views')) {
+            newAchievements.push('first_10_views');
+            balance += 0.05;
+            addToHistory('achievement', '🏆 First 10 Views (+$0.05)');
+        }
+        
+        if (totalViews >= 100 && !achievements.includes('century_viewer')) {
+            newAchievements.push('century_viewer');
+            balance += 0.25;
+            addToHistory('achievement', '🏆 Century Viewer (+$0.25)');
+        }
+        
+        if (totalViews >= 1000 && !achievements.includes('thousand_club')) {
+            newAchievements.push('thousand_club');
+            balance += 1.0;
+            addToHistory('achievement', '🏆 Thousand Club (+$1.00)');
+        }
+        
+        // Streak achievements
+        if (dailyStreak >= 7 && !achievements.includes('week_warrior')) {
+            newAchievements.push('week_warrior');
+            balance += 0.5;
+            addToHistory('achievement', '🏆 Week Warrior (+$0.50)');
+        }
+        
+        if (dailyStreak >= 30 && !achievements.includes('month_master')) {
+            newAchievements.push('month_master');
+            balance += 2.0;
+            addToHistory('achievement', '🏆 Month Master (+$2.00)');
+        }
+        
+        // Referral achievements
+        if (referralCount >= 5 && !achievements.includes('social_butterfly')) {
+            newAchievements.push('social_butterfly');
+            balance += 1.0;
+            addToHistory('achievement', '🏆 Social Butterfly (+$1.00)');
+        }
+        
+        if (referralCount >= 25 && !achievements.includes('influencer')) {
+            newAchievements.push('influencer');
+            balance += 5.0;
+            addToHistory('achievement', '🏆 Influencer (+$5.00)');
+        }
+        
+        achievements.push(...newAchievements);
+        
+        if (newAchievements.length > 0) {
+            updateDisplay();
+        }
+    }
+
+    function renderAchievements() {
+        const achievementsList = document.getElementById('achievements-list');
+        
+        const allAchievements = [
+            {
+                id: 'first_10_views',
+                icon: '👁️',
+                title: 'First 10 Views',
+                description: 'Watch your first 10 ads',
+                reward: '$0.05',
+                progress: Math.min(totalViews, 10),
+                target: 10
+            },
+            {
+                id: 'century_viewer',
+                icon: '💯',
+                title: 'Century Viewer',
+                description: 'Reach 100 total views',
+                reward: '$0.25',
+                progress: Math.min(totalViews, 100),
+                target: 100
+            },
+            {
+                id: 'thousand_club',
+                icon: '🎯',
+                title: 'Thousand Club',
+                description: 'Achieve 1000 total views',
+                reward: '$1.00',
+                progress: Math.min(totalViews, 1000),
+                target: 1000
+            },
+            {
+                id: 'week_warrior',
+                icon: '⚔️',
+                title: 'Week Warrior',
+                description: 'Maintain 7-day login streak',
+                reward: '$0.50',
+                progress: Math.min(dailyStreak, 7),
+                target: 7
+            },
+            {
+                id: 'month_master',
+                icon: '👑',
+                title: 'Month Master',
+                description: 'Maintain 30-day login streak',
+                reward: '$2.00',
+                progress: Math.min(dailyStreak, 30),
+                target: 30
+            },
+            {
+                id: 'social_butterfly',
+                icon: '🦋',
+                title: 'Social Butterfly',
+                description: 'Refer 5 friends',
+                reward: '$1.00',
+                progress: Math.min(referralCount, 5),
+                target: 5
+            },
+            {
+                id: 'influencer',
+                icon: '🌟',
+                title: 'Influencer',
+                description: 'Refer 25 friends',
+                reward: '$5.00',
+                progress: Math.min(referralCount, 25),
+                target: 25
+            }
+        ];
+        
+        achievementsList.innerHTML = allAchievements.map(ach => {
+            const isCompleted = achievements.includes(ach.id);
+            const progressPercent = Math.min((ach.progress / ach.target) * 100, 100);
+            
+            return `
+                <div class="achievement-item ${isCompleted ? 'completed' : ''}">
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-info">
+                        <h4>${ach.title} ${isCompleted ? '✓' : ''}</h4>
+                        <p>${ach.description} (${ach.progress}/${ach.target})</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                    <div class="achievement-reward">${isCompleted ? '✓' : ach.reward}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // --- Referral System ---
+    function updateReferralLink() {
+        if (tgUser && botSettings.botName) {
+            const referralLink = `https://t.me/${botSettings.botName}?start=ref_${tgUser.id}`;
+            const linkElement = document.getElementById('referral-link');
+            if (linkElement) {
+                linkElement.textContent = referralLink;
+            }
+        }
+    }
+
+    function copyReferralLink() {
+        const linkElement = document.getElementById('referral-link');
+        if (linkElement && linkElement.textContent.startsWith('https://')) {
+            navigator.clipboard.writeText(linkElement.textContent).then(() => {
+                alert('Referral link copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = linkElement.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Referral link copied!');
+            });
+        }
+    }
+
+    // Process referral bonus (call this when someone joins via referral)
+    function processReferralBonus(referrerUserId, newUserEarning) {
+        const bonus = newUserEarning * REFERRAL_BONUS;
+        
+        // Update referrer's data
+        database.ref(`users/${referrerUserId}`).transaction((userData) => {
+            if (userData) {
+                userData.balance = (userData.balance || 0) + bonus;
+                userData.totalReferralEarnings = (userData.totalReferralEarnings || 0) + bonus;
+                userData.referralCount = (userData.referralCount || 0) + 1;
+                
+                // Add to history
+                const historyItem = {
+                    type: 'referral',
+                    detail: `Referral bonus: +${bonus.toFixed(4)}`,
+                    timestamp: new Date().toISOString()
+                };
+                userData.historyLog = userData.historyLog || [];
+                userData.historyLog.unshift(historyItem);
+                
+                if (userData.historyLog.length > 50) {
+                    userData.historyLog.pop();
+                }
+            }
+            return userData;
+        });
     }
 </script>
 </body>
